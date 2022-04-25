@@ -19,6 +19,8 @@ import java.sql.Statement;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+//import java.sql.Date;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -41,7 +43,7 @@ public class BillDAOImp extends DAO implements BillDAO {
         String sql = "select tblbill.id as id, tblcar.name as carName, createdAt, carId from tblbill\n" +
                 "inner join tblcar\n" +
                 "on tblbill.carId = tblcar.id\n" +
-                "where carId = ? and confirmStatus = \"Confirmed\" and createdAt BETWEEN ? and ?;";
+                "where carId = ? and confirmStatus = \"Confirmed\" and createdAt BETWEEN ? and ?";
         try {
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setInt(1, carId);
@@ -90,6 +92,39 @@ public class BillDAOImp extends DAO implements BillDAO {
         }
         return result;
 
+    }
+
+    @Override
+    public List<BillDTO> getBillByDate(String startDate, String endDate) {
+        List<BillDTO> result = new ArrayList<BillDTO>();
+        String sql = "SELECT * FROM tblBill WHERE createdAt BETWEEN ? AND ?";
+        try {
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setString(1, startDate);
+            ps.setString(2, endDate);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()){
+                int id = rs.getInt("id");
+                String createdAt = rs.getString("createdAt");
+                String paymentStatus = rs.getString("paymentStatus");
+                String confirmStatus = rs.getString("confirmStatus");
+                String paymentMethod = rs.getString("paymentMethod");
+                float totalPrice = rs.getFloat("totalPrice");
+                String startDateModel = rs.getString("startDate");
+                String endDateModel = rs.getString("endDate");
+                int employeeId = rs.getInt("employeeId");
+                int carId = rs.getInt("carId");
+                int customerId = rs.getInt("customerId");
+
+                result.add(new BillDTO(id, createdAt, paymentStatus, confirmStatus, paymentMethod, totalPrice, startDateModel, endDateModel, employeeId, carId, customerId));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return result;
     }
 
     @Override

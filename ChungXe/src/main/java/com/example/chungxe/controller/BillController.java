@@ -17,6 +17,7 @@ public class BillController {
     @Autowired
     BillDAO billDAO;
 
+    /*GET REQUEST*/
     @GetMapping("car")
     public List<ShortBill> getBillsByCar(@RequestParam int carId, String startDate, String endDate){
         return billDAO.getBillsByCar(carId, startDate, endDate);
@@ -36,9 +37,16 @@ public class BillController {
         return billDAO.getNotConfirmedBills();
     }
 
+    @GetMapping("/date")
+    public List<BillDTO> getBillsByDate(@RequestParam String startDate, @RequestParam String endDate){
+        return billDAO.getBillByDate(startDate, endDate);
+    }
+
+    /*POST REQUEST*/
     @PostMapping("confirm")
     public void confirmBill(@RequestBody Confirm data){
         billDAO.confirmBill(data.getId(), data.getStatus());
     }
+
 
 }

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 @Service
 public class CustomerDAOImp extends DAO implements CustomerDAO {
@@ -79,5 +80,10 @@ public class CustomerDAOImp extends DAO implements CustomerDAO {
             e.printStackTrace();
         }
         return customer;
+    }
+
+    @Override
+    public List<Customer> getStatisticCustomerRevenue(String startDate, String endDate) {
+        return null;
     }
 }

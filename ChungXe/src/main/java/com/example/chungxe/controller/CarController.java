@@ -4,6 +4,8 @@ import com.example.chungxe.dao.CarDAO;
 import com.example.chungxe.model.Car;
 import com.example.chungxe.model.Statistic;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -36,6 +38,11 @@ public class CarController {
         return carDAO.getCarByID(carid);
     }
 
+    @GetMapping("/licensePlate")
+    public Car getCarByLicensePlate(@RequestParam String licensePlate) {
+        return carDAO.getCarByLicensePlate(licensePlate);
+    }
+
     @GetMapping("/search")
     public List<Car> searchCar(@RequestParam(required = false) String kw, @RequestParam(required = false, defaultValue = "0") int nbrSeat,
                                @RequestParam(required = false, defaultValue = "0") int branchId,
@@ -50,19 +57,25 @@ public class CarController {
 
     //New Code
     @PostMapping("/addCar")
-    public Car addCar(@RequestParam("name") String name,
+    public ResponseEntity<?> addCar(@RequestParam("name") String name,
                       @RequestParam("imageFile") MultipartFile imageFile,
                       @RequestParam("color") String color,
                       @RequestParam("licensePlate") String licensePlate,
                       @RequestParam("seatNumber") int seatNumber,
                       @RequestParam("price") int price,
-                      @RequestParam("status") String status,
-                      @RequestParam("carCategoryID") int carCategoryID,
-                      @RequestParam("branchID") int branchID) throws IOException {
+                      @RequestParam("carCategoryName") String carCategoryName,
+                      @RequestParam("branchName") String branchName) throws IOException {
         System.out.println(imageFile.getOriginalFilename());
         System.out.println(imageFile.getContentType());
-        return carDAO.addCar(name, imageFile, color, licensePlate, seatNumber, price, status,
-                carCategoryID, branchID);
+        Car result = carDAO.addCar(name, imageFile, color, licensePlate, seatNumber, price,
+                carCategoryName, branchName);
+        System.out.println(result);
+
+        //Fix lỗi phản hồi ở đây
+        if (result == null){
+            return new ResponseEntity("Xe đã tồn tại trong base", HttpStatus.NOT_IMPLEMENTED);
+        }
+        return ResponseEntity.ok(result);
     }
 
 }

@@ -12,7 +12,7 @@ import lombok.*;
 @Builder
 public class BillDTO {
     private int id;
-    private String createAt;
+    private String createdAt;
     private String paymentStatus;
     private String confirmStatus;
     private String paymentMethod;

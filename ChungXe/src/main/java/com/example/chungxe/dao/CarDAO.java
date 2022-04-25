@@ -18,5 +18,7 @@ public interface CarDAO {
 
     //New Code
     Car addCar(String name, MultipartFile imageFile, String color, String licensePlate,
-               int seatNumber, float price, String status, int carCategoryID, int branchID) throws IOException;
+               int seatNumber, float price, String carCategoryName, String branchName) throws IOException;
+
+    Car getCarByLicensePlate (String licensePlate);
 }

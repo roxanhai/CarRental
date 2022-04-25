@@ -7,4 +7,5 @@ import java.util.List;
 public interface CarCategoryDAO {
     CarCategory getCarCategoryByID(int carCategoryID);
     List<CarCategory> getListCategory();
+    CarCategory getCarCategoryByName(String carCategoryName);
 }

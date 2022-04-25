@@ -5,6 +5,7 @@ import com.example.chungxe.model.CarCategory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -14,10 +15,15 @@ import java.util.List;
 public class CategoryController {
 
     @Autowired
-    CarCategoryDAO carCategoryDAO;
+    private CarCategoryDAO carCategoryDAO;
 
     @GetMapping("")
     public List<CarCategory> getListCategory() {
         return carCategoryDAO.getListCategory();
+    }
+
+    @GetMapping("/name")
+    public  CarCategory getCarCategoryByName(@RequestParam("carCategoryName") String carCategoryName) {
+        return carCategoryDAO.getCarCategoryByName(carCategoryName);
     }
 }

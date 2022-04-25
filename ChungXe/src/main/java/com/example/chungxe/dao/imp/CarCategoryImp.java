@@ -59,4 +59,26 @@ public class CarCategoryImp extends DAO implements CarCategoryDAO {
         }
         return listCategory;
     }
+
+    @Override
+    public CarCategory getCarCategoryByName(String carCategoryName) {
+        System.out.println(carCategoryName);
+        CarCategory carCategory = null;
+        String sql = "SELECT * FROM tblCarCategory WHERE name = ?";
+        try {
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setString(1, carCategoryName);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                int id = rs.getInt("id");
+                String name = rs.getString("name");
+                carCategory = new CarCategory(id, name);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return carCategory;
+    }
+
 }

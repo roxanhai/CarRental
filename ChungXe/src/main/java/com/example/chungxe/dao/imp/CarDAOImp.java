@@ -9,6 +9,8 @@ import com.example.chungxe.model.Car;
 import com.example.chungxe.model.CarCategory;
 import com.example.chungxe.model.Statistic;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -110,6 +112,7 @@ public class CarDAOImp extends DAO implements CarDAO {
         }
         return car;
     }
+
 
     @Override
     public List<Car> searchCar(String kw, int nbrSeat, int branchId, int categoryId) {
@@ -216,45 +219,89 @@ public class CarDAOImp extends DAO implements CarDAO {
         return result;
     }
 
-    //New Code
     @Override
-    public Car addCar(String name, MultipartFile imageFile, String color, String licensePlate, int seatNumber, float price, String status, int carCategoryID, int branchID) throws IOException {
-        String image64 = Base64.getEncoder().encodeToString(imageFile.getBytes());
-        CarCategory carCategory = carCategoryDAO.getCarCategoryByID(carCategoryID);
-        Branch branch = branchDAO.getBranchByID(branchID);
-        Car new_car = new Car();
-        new_car.setName(name);
-        new_car.setColor(color);
-        new_car.setLicensePlate(licensePlate);
-        new_car.setImage64(image64);
-        new_car.setSeatNumber(seatNumber);
-        new_car.setPrice(price);
-        new_car.setStatus(status);
-        new_car.setCarCategory(carCategory);
-        new_car.setBranch(branch);
-
-
-
-        String sql = "insert into tblCar(name, color, licensePlate, seatNumber, price, image64, status, categoryId, branchId) values (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    public Car getCarByLicensePlate(String licensePlate) {
+        Car car = null;
+        String sql = "SELECT * from tblCar WHERE licensePlate = ?";
         try {
-            PreparedStatement ps = con.prepareStatement(sql);
-            ps.setString(1, name);
-            ps.setString(2, color);
-            ps.setString(3, licensePlate);
-            ps.setInt(4, seatNumber);
-            ps.setFloat(5, price);
-            ps.setString(6, image64);
-            ps.setString(7, status);
-            ps.setInt(8, carCategoryID);
-            ps.setInt(9, branchID);
-            String queryResult = String.valueOf(ps.executeUpdate());
 
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setString(1,licensePlate);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                String name = rs.getString("name");
+                String licensePlateData = rs.getString("licensePlate");
+                String color = rs.getString("color");
+                int seatNumber = rs.getInt("seatNumber");
+                float price = rs.getFloat("price");
+                String image64 = rs.getString("image64");
+                String status = rs.getString("status");
+                int categoryId = rs.getInt("categoryId");
+                int branchId = rs.getInt("branchId");
+                CarCategory carCategory = carCategoryDAO.getCarCategoryByID(categoryId);
+                Branch branch = branchDAO.getBranchByID(branchId);
+                car = Car.builder()
+                        .id(id)
+                        .name(name)
+                        .color(color)
+                        .licensePlate(licensePlate)
+                        .seatNumber(seatNumber)
+                        .price(price)
+                        .image64(image64)
+                        .status(status)
+                        .carCategory(carCategory)
+                        .branch(branch)
+                        .build();
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return new_car;
+        return car;
     }
 
+    @Override
+    public Car addCar(String name, MultipartFile imageFile, String color, String licensePlate, int seatNumber, float price, String carCategoryName, String branchName) throws IOException {
+
+        Car result = this.getCarByLicensePlate(licensePlate);
+
+        if(result == null) {
+            String image64 = Base64.getEncoder().encodeToString(imageFile.getBytes());
+            CarCategory carCategory = carCategoryDAO.getCarCategoryByName(carCategoryName);
+            Branch branch = branchDAO.getBranchByName(branchName);
+            Car new_car = new Car();
+            new_car.setName(name);
+            new_car.setColor(color);
+            new_car.setLicensePlate(licensePlate);
+            new_car.setImage64(image64);
+            new_car.setSeatNumber(seatNumber);
+            new_car.setPrice(price);
+            new_car.setStatus("10");
+            new_car.setCarCategory(carCategory);
+            new_car.setBranch(branch);
+
+
+            String sql = "insert into tblCar(name, color, licensePlate, seatNumber, price, image64, status, categoryId, branchId) values (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            try {
+                PreparedStatement ps = con.prepareStatement(sql);
+                ps.setString(1, name);
+                ps.setString(2, color);
+                ps.setString(3, licensePlate);
+                ps.setInt(4, seatNumber);
+                ps.setFloat(5, price);
+                ps.setString(6, image64);
+                ps.setString(7, "A");
+                ps.setInt(8, carCategory.getId());
+                ps.setInt(9, branch.getId());
+                String queryResult = String.valueOf(ps.executeUpdate());
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            return new_car;
+        }
+        return null;
+    }
 
 
 

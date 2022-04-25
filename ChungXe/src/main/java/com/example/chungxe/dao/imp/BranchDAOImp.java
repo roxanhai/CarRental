@@ -60,4 +60,25 @@ public class BranchDAOImp extends DAO implements BranchDAO {
         }
         return listBranch;
     }
+
+    @Override
+    public Branch getBranchByName(String branchName) {
+        Branch branch = null;
+        String sql = "SELECT * FROM tblBranch WHERE name = ?";
+        try {
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setString(1, branchName);
+            ResultSet rs = ps.executeQuery();
+
+
+            if (rs.next()) {
+                int id = rs.getInt("id");
+                String name = rs.getString("name");
+                branch = new Branch(id, name);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return branch;
+    }
 }

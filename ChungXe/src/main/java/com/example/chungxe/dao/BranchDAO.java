@@ -8,4 +8,5 @@ import java.util.List;
 public interface BranchDAO {
     Branch getBranchByID(int branchID);
     List<Branch> getListBranch();
+    Branch getBranchByName(String branchName);
 }

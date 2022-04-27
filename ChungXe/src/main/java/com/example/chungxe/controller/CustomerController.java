@@ -5,6 +5,8 @@ import com.example.chungxe.dao.CustomerDAO;
 import com.example.chungxe.model.dto.Credential;
 import com.example.chungxe.model.Customer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -24,6 +26,12 @@ public class CustomerController {
         return customerDAO.getCustomerByID(id);
     }
 
+    @GetMapping("/phoneNum")
+    public ResponseEntity<?> getCustomerByPhoneNum(@RequestParam String phoneNum){
+        Customer result = customerDAO.getCustomerByPhoneNumber(phoneNum);
+        if(result == null) return new ResponseEntity("Không tìm thấy Customer thoả mãn yêu cầu", HttpStatus.NOT_IMPLEMENTED);
+        return ResponseEntity.ok(result);
+    }
 
 
 }

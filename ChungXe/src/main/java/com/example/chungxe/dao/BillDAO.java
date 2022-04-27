@@ -13,7 +13,9 @@ public interface BillDAO {
     List<BillDTO> getBillByDate(String startDate, String endDate);
     List<Bill> getNotConfirmedBills();
     void confirmBill(int billId, String status);
-
+    List<Bill> getBillsByLicensePlate(String licensePlate);
+    List<Bill> getBillsByPhoneNum(String phoneNum);
     Bill createBill(BillDTO billDTO);
+    Bill updateBillById(BillDTO bill, int id);
 
 }

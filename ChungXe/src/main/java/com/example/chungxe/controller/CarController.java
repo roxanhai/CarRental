@@ -65,15 +65,13 @@ public class CarController {
                       @RequestParam("price") int price,
                       @RequestParam("carCategoryName") String carCategoryName,
                       @RequestParam("branchName") String branchName) throws IOException {
-        System.out.println(imageFile.getOriginalFilename());
-        System.out.println(imageFile.getContentType());
         Car result = carDAO.addCar(name, imageFile, color, licensePlate, seatNumber, price,
                 carCategoryName, branchName);
         System.out.println(result);
 
         //Fix lỗi phản hồi ở đây
         if (result == null){
-            return new ResponseEntity("Xe đã tồn tại trong base", HttpStatus.NOT_IMPLEMENTED);
+            return new ResponseEntity("Xe đã tồn tại trong database", HttpStatus.NOT_IMPLEMENTED);
         }
         return ResponseEntity.ok(result);
     }

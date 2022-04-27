@@ -6,6 +6,8 @@ import com.example.chungxe.model.dto.BillDTO;
 import com.example.chungxe.model.dto.Confirm;
 import com.example.chungxe.model.dto.ShortBill;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,9 +24,11 @@ public class BillController {
     public List<ShortBill> getBillsByCar(@RequestParam int carId, String startDate, String endDate){
         return billDAO.getBillsByCar(carId, startDate, endDate);
     }
-    @GetMapping("bill_id")
-    public Bill getBillById(@RequestParam int id){
-        return billDAO.getBillById(id);
+    @GetMapping("/bill_id")
+    public ResponseEntity<?> getBillById(@RequestParam int id){
+        Bill result = billDAO.getBillById(id);
+        if(result == null) return new ResponseEntity("Không tìm thấy Bill thoả mãn yêu cầu", HttpStatus.NOT_IMPLEMENTED);
+        return ResponseEntity.ok(result);
     }
 
     @PostMapping("/create_bill")
@@ -32,7 +36,7 @@ public class BillController {
         return billDAO.createBill(billDTO);
     }
 
-    @GetMapping("confirm")
+    @GetMapping("/pending")
     public List<Bill> getNotConfirmedBills(){
         return billDAO.getNotConfirmedBills();
     }
@@ -42,11 +46,27 @@ public class BillController {
         return billDAO.getBillByDate(startDate, endDate);
     }
 
+    @GetMapping("/licensePlate")
+    public ResponseEntity<?> getBillsBylicensePlate(@RequestParam String licensePlate){
+        List<Bill> result = billDAO.getBillsByLicensePlate(licensePlate);
+        if(result == null) return new ResponseEntity("Không tìm thấy Bill thoả mãn yêu cầu", HttpStatus.NOT_IMPLEMENTED);
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/phoneNum")
+    public ResponseEntity<?> getBillsByPhoneNum(@RequestParam String phoneNum){
+        List<Bill> result = billDAO.getBillsByPhoneNum(phoneNum);
+        if(result == null) return new ResponseEntity("Không tìm thấy Bill thoả mãn yêu cầu", HttpStatus.NOT_IMPLEMENTED);
+        return ResponseEntity.ok(result);
+    }
     /*POST REQUEST*/
     @PostMapping("confirm")
     public void confirmBill(@RequestBody Confirm data){
         billDAO.confirmBill(data.getId(), data.getStatus());
     }
 
-
+    @PutMapping("/{id}")
+    public Bill updateBillById(@PathVariable("id") int id, @RequestBody BillDTO bill){
+        return billDAO.updateBillById(bill, id);
+    }
 }

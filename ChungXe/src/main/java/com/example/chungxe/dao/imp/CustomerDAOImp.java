@@ -86,4 +86,37 @@ public class CustomerDAOImp extends DAO implements CustomerDAO {
     public List<Customer> getStatisticCustomerRevenue(String startDate, String endDate) {
         return null;
     }
+
+    @Override
+    public Customer getCustomerByPhoneNumber(String phoneNum) {
+        Customer customer = null;
+        String sql = "SELECT * FROM tblCustomer WHERE telephone = ?";
+        try {
+            PreparedStatement ps =con.prepareStatement(sql);
+            ps.setString(1, phoneNum);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                int cusId = rs.getInt("id");
+                String fullName = rs.getString("fullname");
+                String identityCard = rs.getString("identityCard");
+                String telephone = rs.getString("telephone");
+                String address = rs.getString("address");
+                String username = rs.getString("username");
+                customer = Customer.builder()
+                        .id(cusId)
+                        .fullName(fullName)
+                        .identityCard(identityCard)
+                        .telephone(telephone)
+                        .address(address)
+                        .username(username)
+                        .build();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        if(customer==null){
+            return null;
+        }
+        return customer;
+    }
 }

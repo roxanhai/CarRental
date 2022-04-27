@@ -84,7 +84,7 @@ public class BillDAOImp extends DAO implements BillDAO {
                 Employee employee = employeeDAO.getEmployeeByID(employeeId);
                 Customer customer = customerDAO.getCustomerByID(customerId);
                 Car car = carDAO.getCarByID(carId);
-                result =  new Bill(billId, createdAt, paymentStatus, confirmStatus, paymentMethod, totalPrice,
+                result = new Bill(billId, createdAt, paymentStatus, confirmStatus, paymentMethod, totalPrice,
                         startDate, endDate, employee, car, customer);
             }
         } catch (SQLException e) {
@@ -163,6 +163,34 @@ public class BillDAOImp extends DAO implements BillDAO {
     }
 
     @Override
+    public Bill updateBillById(BillDTO bill, int id) {
+        Bill result = null;
+        String sql = "UPDATE tblBill SET createdAt = ?, paymentStatus = ? , confirmStatus = ?, paymentMethod = ?, totalPrice = ?, startDate = ?, endDate = ?, carId = ?, customerId = ? WHERE id = ? ";
+
+        try {
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setString(1,bill.getCreatedAt());
+            ps.setString(2,bill.getPaymentStatus());
+            ps.setString(3,bill.getConfirmStatus());
+            ps.setString(4,bill.getPaymentMethod());
+            ps.setFloat(5,bill.getTotalPrice());
+            ps.setString(6,bill.getStartDate());
+            ps.setString(7,bill.getEndDate());
+            ps.setInt(8,bill.getCarId());
+            ps.setInt(9,bill.getCustomerId());
+            ps.setInt(10, id);
+
+
+            int res = ps.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        result = this.getBillById(id);
+        return result;
+    }
+
+    @Override
     public List<Bill> getNotConfirmedBills()  {
         List<Bill> result = new ArrayList<>();
         String sql = "select * from tblbill\n" +
@@ -207,6 +235,82 @@ public class BillDAOImp extends DAO implements BillDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public List<Bill> getBillsByLicensePlate(String licensePlate) {
+        Car carData = carDAO.getCarByLicensePlate(licensePlate);
+        if(carData ==null) return null;
+        List<Bill> result = new ArrayList<>();
+        String sql = "select * from tblbill\n" +
+                "where carId = ?";
+        int check =0;
+        try {
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setInt(1,carData.getId());
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()){
+                int billId = rs.getInt("id");
+                String createdAt = rs.getString("createdAt");
+                String paymentStatus = rs.getString("paymentStatus");
+                String confirmStatus = rs.getString("confirmStatus");
+                String paymentMethod = rs.getString("paymentMethod");
+                float totalPrice = rs.getFloat("totalPrice");
+                String startDate = rs.getString("startDate");
+                String endDate = rs.getString("endDate");
+                int employeeId = rs.getInt("employeeId");
+                int customerId = rs.getInt("customerId");
+                int carId = rs.getInt("carId");
+                Employee employee = employeeDAO.getEmployeeByID(employeeId);
+                Customer customer = customerDAO.getCustomerByID(customerId);
+                Car car = carDAO.getCarByID(carId);
+                result.add(  new Bill(billId, createdAt, paymentStatus, confirmStatus, paymentMethod, totalPrice,
+                        startDate, endDate, employee, car, customer));
+                check++;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        if(check==0) return null;
+        return result;
+    }
+
+    @Override
+    public List<Bill> getBillsByPhoneNum(String phoneNum) {
+        Customer customerData = customerDAO.getCustomerByPhoneNumber(phoneNum);
+        if(customerData ==null) return null;
+        List<Bill> result = new ArrayList<>();
+        String sql = "select * from tblbill\n" +
+                "where customerId = ?";
+        int check =0;
+        try {
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setInt(1,customerData.getId());
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()){
+                int billId = rs.getInt("id");
+                String createdAt = rs.getString("createdAt");
+                String paymentStatus = rs.getString("paymentStatus");
+                String confirmStatus = rs.getString("confirmStatus");
+                String paymentMethod = rs.getString("paymentMethod");
+                float totalPrice = rs.getFloat("totalPrice");
+                String startDate = rs.getString("startDate");
+                String endDate = rs.getString("endDate");
+                int employeeId = rs.getInt("employeeId");
+                int customerId = rs.getInt("customerId");
+                int carId = rs.getInt("carId");
+                Employee employee = employeeDAO.getEmployeeByID(employeeId);
+                Customer customer = customerDAO.getCustomerByID(customerId);
+                Car car = carDAO.getCarByID(carId);
+                result.add(  new Bill(billId, createdAt, paymentStatus, confirmStatus, paymentMethod, totalPrice,
+                        startDate, endDate, employee, car, customer));
+                check++;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        if(check==0) return null;
+        return result;
     }
 
 }

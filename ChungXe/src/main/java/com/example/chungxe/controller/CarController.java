@@ -2,6 +2,7 @@ package com.example.chungxe.controller;
 
 import com.example.chungxe.dao.CarDAO;
 import com.example.chungxe.model.Car;
+import com.example.chungxe.model.CarStat;
 import com.example.chungxe.model.Statistic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -53,6 +54,11 @@ public class CarController {
     @GetMapping("/getListSeat")
     public List<Integer> getListNbrSeat() {
         return carDAO.getListNbrSeat();
+    }
+
+    @GetMapping("/statisticByCar")
+    public List<CarStat> getRevenueStatByCar(){
+        return carDAO.getRevenueStatByCar();
     }
 
     //New Code

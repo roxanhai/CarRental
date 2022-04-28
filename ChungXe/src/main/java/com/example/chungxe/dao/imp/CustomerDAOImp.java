@@ -2,12 +2,15 @@ package com.example.chungxe.dao.imp;
 
 import com.example.chungxe.dao.CustomerDAO;
 import com.example.chungxe.dao.DAO;
+import com.example.chungxe.model.CarStat;
 import com.example.chungxe.model.Customer;
+import com.example.chungxe.model.CustomerStat;
 import org.springframework.stereotype.Service;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -118,5 +121,35 @@ public class CustomerDAOImp extends DAO implements CustomerDAO {
             return null;
         }
         return customer;
+    }
+
+    @Override
+    public List<CustomerStat> getRevenueStatByCustomer() {
+        List<CustomerStat> result = new ArrayList<CustomerStat>();
+        String sql = "-- CREATE TABLE CarStat  \n" +
+                "-- SELECT tblCar.id, tblCar.name, tblCar.licensePlate, COUNT(tblBill.totalPrice) AS revenue\n" +
+                "-- FROM sqa.tblCar LEFT JOIN sqa.tblBill ON tblCar.id = tblBill.carId\n" +
+                "-- GROUP BY sqa.tblCar.id;\n" +
+                "\n" +
+                "SELECT tblCustomer.id, tblCustomer.fullname, tblCustomer.telephone,tblCustomer.identityCard, SUM(tblBill.totalPrice) AS revenue\n" +
+                "FROM sqa.tblCustomer LEFT JOIN sqa.tblBill ON tblCustomer.id = tblBill.customerId\n" +
+                "GROUP BY tblCustomer.id\n" +
+                "Order By Revenue DESC;\n";
+
+        try {
+            PreparedStatement ps = con.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                int cusId = rs.getInt("id");
+                String fullname = rs.getString("fullname");
+                String telephone = rs.getString("telephone");
+                String identityCard = rs.getString("identityCard");
+                float revenue = rs.getFloat("revenue");
+                result.add (new CustomerStat(cusId, fullname, telephone,identityCard, revenue));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return result;
     }
 }

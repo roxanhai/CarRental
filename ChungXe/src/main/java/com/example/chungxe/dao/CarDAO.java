@@ -2,6 +2,7 @@ package com.example.chungxe.dao;
 
 import com.example.chungxe.model.Branch;
 import com.example.chungxe.model.Car;
+import com.example.chungxe.model.CarStat;
 import com.example.chungxe.model.CarCategory;
 import com.example.chungxe.model.Statistic;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,7 +16,7 @@ public interface CarDAO {
     List<Car> searchCar(String kw, int nbrSeat, int branchId, int categoryId);
     List<Integer> getListNbrSeat();
     List<Statistic> getStatisticByCar(String startDate, String endDate);
-
+    List<CarStat> getRevenueStatByCar();
     //New Code
     Car addCar(String name, MultipartFile imageFile, String color, String licensePlate,
                int seatNumber, float price, String carCategoryName, String branchName) throws IOException;

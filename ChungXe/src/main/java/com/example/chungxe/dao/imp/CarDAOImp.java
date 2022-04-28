@@ -7,6 +7,7 @@ import com.example.chungxe.dao.DAO;
 import com.example.chungxe.model.Branch;
 import com.example.chungxe.model.Car;
 import com.example.chungxe.model.CarCategory;
+import com.example.chungxe.model.CarStat;
 import com.example.chungxe.model.Statistic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -213,6 +214,28 @@ public class CarDAOImp extends DAO implements CarDAO {
                 result.add(new Statistic(doanhthu, carId,  startDate, endDate, carName));
             }
 
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    @Override
+    public List<CarStat> getRevenueStatByCar() {
+        List<CarStat> result = new ArrayList<CarStat>();
+        String sql = "SELECT tblCar.id, tblCar.name, tblCar.licensePlate, SUM(tblBill.totalPrice) AS revenue " +
+                "FROM sqa.tblCar LEFT JOIN sqa.tblBill ON tblCar.id = tblBill.carId " +
+                "GROUP BY tblCar.id Order By Revenue DESC";
+        try {
+            PreparedStatement ps = con.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                int carId = rs.getInt("id");
+                String name = rs.getString("name");
+                String licensePlate = rs.getString("licensePlate");
+                float revenue = rs.getFloat("revenue");
+                result.add (new CarStat(carId, name, licensePlate, revenue));
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }

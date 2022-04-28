@@ -8,7 +8,7 @@ import java.util.Date;
 import java.util.List;
 //import java.sql.Date;
 public interface BillDAO {
-    List<ShortBill> getBillsByCar(int carId, String startDate, String endDate);
+    List<BillDTO> getBillsByDateAndCar(int carId, String startDate, String endDate);
     Bill getBillById(int billId);
     List<BillDTO> getBillByDate(String startDate, String endDate);
     List<Bill> getNotConfirmedBills();

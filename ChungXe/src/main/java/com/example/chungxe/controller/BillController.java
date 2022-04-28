@@ -21,8 +21,12 @@ public class BillController {
 
     /*GET REQUEST*/
     @GetMapping("car")
-    public List<ShortBill> getBillsByCar(@RequestParam int carId, String startDate, String endDate){
-        return billDAO.getBillsByCar(carId, startDate, endDate);
+    public List<BillDTO> getBillsByCarAndDate(@RequestParam int carId, @RequestParam String startDate, @RequestParam String endDate){
+        startDate += " 00:00:00";
+        endDate += " 23:59:59";
+        System.out.println(startDate);
+        System.out.println(endDate);
+        return billDAO.getBillsByDateAndCar(carId, startDate, endDate);
     }
     @GetMapping("/bill_id")
     public ResponseEntity<?> getBillById(@RequestParam int id){

@@ -22,4 +22,5 @@ public interface CarDAO {
                int seatNumber, float price, String carCategoryName, String branchName) throws IOException;
 
     Car getCarByLicensePlate (String licensePlate);
+
 }

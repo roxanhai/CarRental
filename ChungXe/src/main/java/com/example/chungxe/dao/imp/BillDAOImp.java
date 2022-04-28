@@ -38,12 +38,10 @@ public class BillDAOImp extends DAO implements BillDAO {
     private CarDAO carDAO;
 
     @Override
-    public List<ShortBill> getBillsByCar(int carId, String startDate, String endDate) {
-        List<ShortBill> result = new ArrayList<>();
-        String sql = "select tblbill.id as id, tblcar.name as carName, createdAt, carId from tblbill\n" +
-                "inner join tblcar\n" +
-                "on tblbill.carId = tblcar.id\n" +
-                "where carId = ? and confirmStatus = \"Confirmed\" and createdAt BETWEEN ? and ?";
+    public List<BillDTO> getBillsByDateAndCar(int carId, String startDate, String endDate) {
+        List<BillDTO> result = new ArrayList<>();
+        Car car = carDAO.getCarByID(carId);
+        String sql = "select * FROM sqa.tblBill where carId = ? and createdAt BETWEEN ? and ?";
         try {
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setInt(1, carId);
@@ -53,8 +51,18 @@ public class BillDAOImp extends DAO implements BillDAO {
             while (rs.next()){
                 int id = rs.getInt("id");
                 String createdAt = rs.getString("createdAt");
-                String carName = rs.getString("carName");
-                result.add(new ShortBill(id, carId, carName,  createdAt));
+                String paymentStatus = rs.getString("paymentStatus");
+                String paymentMethod = rs.getString("paymentMethod");
+                String confirmStatus = rs.getString("confirmStatus");
+                float totalPrice = rs.getFloat("totalPrice");
+                String startDateData = rs.getString("startDate");
+                String endDateData = rs.getString("endDate");
+                int empId = rs.getInt("employeeId");
+                int carID = carId;
+                int cusId = rs.getInt("customerId");
+
+                result.add(new BillDTO(id, createdAt, paymentStatus ,confirmStatus, paymentMethod
+                ,totalPrice, startDateData, endDateData ,empId, carID, cusId));
             }
         } catch (SQLException e) {
             e.printStackTrace();

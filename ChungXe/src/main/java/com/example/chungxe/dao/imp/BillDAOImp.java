@@ -71,8 +71,8 @@ public class BillDAOImp extends DAO implements BillDAO {
     }
 
     @Override
-    public Bill getBillById(int billId) {
-        Bill result = null;
+    public BillDTO getBillById(int billId) {
+        BillDTO result = null;
         String sql = "select * from tblBill where id = ?";
         try {
             PreparedStatement ps = con.prepareStatement(sql);
@@ -89,11 +89,8 @@ public class BillDAOImp extends DAO implements BillDAO {
                 int employeeId = rs.getInt("employeeId");
                 int customerId = rs.getInt("customerId");
                 int carId = rs.getInt("carId");
-                Employee employee = employeeDAO.getEmployeeByID(employeeId);
-                Customer customer = customerDAO.getCustomerByID(customerId);
-                Car car = carDAO.getCarByID(carId);
-                result = new Bill(billId, createdAt, paymentStatus, confirmStatus, paymentMethod, totalPrice,
-                        startDate, endDate, employee, car, customer);
+                result = new BillDTO(billId, createdAt, paymentStatus, confirmStatus, paymentMethod, totalPrice,
+                        startDate, endDate, employeeId, carId, customerId);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -136,8 +133,8 @@ public class BillDAOImp extends DAO implements BillDAO {
     }
 
     @Override
-    public Bill createBill(BillDTO billDTO) {
-        Bill bill = null;
+    public BillDTO createBill(BillDTO billDTO) {
+        BillDTO bill = null;
 
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss");
         LocalDateTime now = LocalDateTime.now();
@@ -145,6 +142,8 @@ public class BillDAOImp extends DAO implements BillDAO {
 
         String sql = "INSERT into tblBill(createdAt, paymentStatus, confirmStatus, paymentMethod, totalPrice, startDate, endDate, carId, customerId)" +
                 "values(?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+
         try {
             PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, createdAt);
@@ -167,26 +166,59 @@ public class BillDAOImp extends DAO implements BillDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
+        String sql2 = "UPDATE sqa.tblCar SET status = 'U/A' WHERE ID = " + bill.getCarId();
+        try {
+            PreparedStatement ps = con.prepareStatement(sql2);
+            int res = ps.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        };
         return bill;
     }
 
     @Override
-    public Bill updateBillById(BillDTO bill, int id) {
-        Bill result = null;
-        String sql = "UPDATE tblBill SET createdAt = ?, paymentStatus = ? , confirmStatus = ?, paymentMethod = ?, totalPrice = ?, startDate = ?, endDate = ?, carId = ?, customerId = ? WHERE id = ? ";
+    public BillDTO updateBillById(BillDTO bill, int id) {
+        BillDTO result = null;
+        BillDTO billData =  this.getBillById(id);
+        String sql = "UPDATE tblBill SET createdAt = ?, paymentStatus = ? , confirmStatus = ?, paymentMethod = ?, totalPrice = ?, startDate = ?, endDate = ?, carId = ?, customerId = ?, employeeId = ? WHERE id = ? ";
 
         try {
             PreparedStatement ps = con.prepareStatement(sql);
-            ps.setString(1,bill.getCreatedAt());
-            ps.setString(2,bill.getPaymentStatus());
-            ps.setString(3,bill.getConfirmStatus());
-            ps.setString(4,bill.getPaymentMethod());
-            ps.setFloat(5,bill.getTotalPrice());
-            ps.setString(6,bill.getStartDate());
-            ps.setString(7,bill.getEndDate());
-            ps.setInt(8,bill.getCarId());
-            ps.setInt(9,bill.getCustomerId());
-            ps.setInt(10, id);
+
+            if(bill.getCreatedAt()!=null) ps.setString(1,bill.getCreatedAt());
+            else  ps.setString(1,billData.getCreatedAt());
+
+            if(bill.getPaymentStatus()==null) ps.setString(2, billData.getPaymentStatus());
+            else ps.setString(2, bill.getPaymentStatus());
+
+            if(bill.getConfirmStatus()==null) ps.setString(3,billData.getConfirmStatus());
+            else ps.setString(3,bill.getConfirmStatus());
+
+
+            if(bill.getPaymentMethod()==null) ps.setString(4,billData.getPaymentMethod());
+            else ps.setString(4,bill.getPaymentMethod());
+
+            if(bill.getTotalPrice()==0.0)  ps.setFloat(5,billData.getTotalPrice());
+            else  ps.setFloat(5,bill.getTotalPrice());
+
+            if(bill.getStartDate()==null)   ps.setString(6,billData.getStartDate());
+            else ps.setString(6,bill.getStartDate());
+
+            if(bill.getEndDate()==null) ps.setString(7,billData.getEndDate());
+            else ps.setString(7,bill.getEndDate());
+
+            if(bill.getCarId()==0) ps.setInt(8,billData.getCarId());
+            else ps.setInt(8,bill.getCarId());
+
+            if(bill.getCustomerId()==0) ps.setInt(9,billData.getCustomerId());
+            else ps.setInt(9,bill.getCustomerId());
+
+            if(bill.getEmployeeId()==0) ps.setInt(10,billData.getEmployeeId());
+            else ps.setInt(10,bill.getEmployeeId());
+
+            ps.setInt(11, id);
 
 
             int res = ps.executeUpdate();

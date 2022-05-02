@@ -61,6 +61,11 @@ public class CarController {
         return carDAO.getRevenueStatByCar();
     }
 
+    @GetMapping("/getAvalibleCar")
+    public List<Car> getListAvalibleCar(){
+        return carDAO.getListAvalibleCar();
+    }
+
     //New Code
     @PostMapping("/addCar")
     public ResponseEntity<?> addCar(@RequestParam("name") String name,

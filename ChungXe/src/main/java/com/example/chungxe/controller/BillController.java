@@ -30,13 +30,13 @@ public class BillController {
     }
     @GetMapping("/bill_id")
     public ResponseEntity<?> getBillById(@RequestParam int id){
-        Bill result = billDAO.getBillById(id);
+        BillDTO result = billDAO.getBillById(id);
         if(result == null) return new ResponseEntity("Không tìm thấy Bill thoả mãn yêu cầu", HttpStatus.NOT_IMPLEMENTED);
         return ResponseEntity.ok(result);
     }
 
     @PostMapping("/create_bill")
-    public Bill createBill(@RequestBody BillDTO billDTO) {
+    public BillDTO createBill(@RequestBody BillDTO billDTO) {
         return billDAO.createBill(billDTO);
     }
 
@@ -70,7 +70,8 @@ public class BillController {
     }
 
     @PutMapping("/{id}")
-    public Bill updateBillById(@PathVariable("id") int id, @RequestBody BillDTO bill){
+    public BillDTO updateBillById(@PathVariable("id") int id, @RequestBody BillDTO bill){
+
         return billDAO.updateBillById(bill, id);
     }
 }

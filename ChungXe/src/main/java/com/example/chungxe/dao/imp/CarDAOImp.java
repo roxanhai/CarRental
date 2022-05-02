@@ -76,6 +76,46 @@ public class CarDAOImp extends DAO implements CarDAO {
     }
 
     @Override
+    public List<Car> getListAvalibleCar() {
+        List<Car> listCar = new ArrayList<>();
+        String sql = "SELECT * FROM sqa.tblCar WHERE status = 'a';";
+        try {
+            PreparedStatement ps = con.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                String name = rs.getString("name");
+                String color = rs.getString("color");
+                String licensePlate = rs.getString("licensePlate");
+                int seatNumber = rs.getInt("seatNumber");
+                float price = rs.getFloat("price");
+                String image = rs.getString("image64");
+                String status = rs.getString("status");
+                int categoryId = rs.getInt("categoryId");
+                int branchId = rs.getInt("branchId");
+                CarCategory carCategory = carCategoryDAO.getCarCategoryByID(categoryId);
+                Branch branch = branchDAO.getBranchByID(branchId);
+                Car car = Car.builder()
+                        .id(id)
+                        .name(name)
+                        .color(color)
+                        .licensePlate(licensePlate)
+                        .seatNumber(seatNumber)
+                        .price(price)
+                        .image64(image)
+                        .status(status)
+                        .carCategory(carCategory)
+                        .branch(branch)
+                        .build();
+                listCar.add(car);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return listCar;
+    }
+
+    @Override
     public Car getCarByID(int carID) {
         Car car = null;
         String sql = "SELECT * FROM tblCar WHERE id = ?";

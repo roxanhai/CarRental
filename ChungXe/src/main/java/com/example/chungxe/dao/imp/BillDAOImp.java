@@ -38,8 +38,8 @@ public class BillDAOImp extends DAO implements BillDAO {
     private CarDAO carDAO;
 
     @Override
-    public List<BillDTO> getBillsByDateAndCar(int carId, String startDate, String endDate) {
-        List<BillDTO> result = new ArrayList<>();
+    public List<Bill> getBillsByDateAndCar(int carId, String startDate, String endDate) {
+        List<Bill> result = new ArrayList<>();
         Car car = carDAO.getCarByID(carId);
         String sql = "select * FROM sqa.tblBill where carId = ? and createdAt BETWEEN ? and ? and confirmStatus = 'confirm' ";
         try {
@@ -61,8 +61,12 @@ public class BillDAOImp extends DAO implements BillDAO {
                 int carID = carId;
                 int cusId = rs.getInt("customerId");
 
-                result.add(new BillDTO(id, createdAt, paymentStatus ,confirmStatus, paymentMethod
-                ,totalPrice, startDateData, endDateData ,empId, carID, cusId));
+                Car carData = carDAO.getCarByID(carID);
+                Employee empData = employeeDAO.getEmployeeByID(empId);
+                Customer cusData = customerDAO.getCustomerByID(cusId);
+
+                result.add(new Bill(id, createdAt, paymentStatus ,confirmStatus, paymentMethod
+                ,totalPrice, startDateData, endDateData ,empData, carData, cusData));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -71,8 +75,8 @@ public class BillDAOImp extends DAO implements BillDAO {
     }
 
     @Override
-    public BillDTO getBillById(int billId) {
-        BillDTO result = null;
+    public Bill getBillById(int billId) {
+        Bill result = null;
         String sql = "select * from tblBill where id = ?";
         try {
             PreparedStatement ps = con.prepareStatement(sql);
@@ -89,8 +93,11 @@ public class BillDAOImp extends DAO implements BillDAO {
                 int employeeId = rs.getInt("employeeId");
                 int customerId = rs.getInt("customerId");
                 int carId = rs.getInt("carId");
-                result = new BillDTO(billId, createdAt, paymentStatus, confirmStatus, paymentMethod, totalPrice,
-                        startDate, endDate, employeeId, carId, customerId);
+                Employee employee = employeeDAO.getEmployeeByID(employeeId);
+                Customer customer = customerDAO.getCustomerByID(customerId);
+                Car car = carDAO.getCarByID(carId);
+                result =  new Bill(billId, createdAt, paymentStatus, confirmStatus, paymentMethod, totalPrice,
+                        startDate, endDate, employee, car, customer);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -100,8 +107,8 @@ public class BillDAOImp extends DAO implements BillDAO {
     }
 
     @Override
-    public List<BillDTO> getBillByDate(String startDate, String endDate) {
-        List<BillDTO> result = new ArrayList<BillDTO>();
+    public List<Bill> getBillByDate(String startDate, String endDate) {
+        List<Bill> result = new ArrayList<Bill>();
         String sql = "SELECT * FROM tblBill WHERE createdAt BETWEEN ? AND ?";
         try {
             PreparedStatement ps = con.prepareStatement(sql);
@@ -122,8 +129,10 @@ public class BillDAOImp extends DAO implements BillDAO {
                 int employeeId = rs.getInt("employeeId");
                 int carId = rs.getInt("carId");
                 int customerId = rs.getInt("customerId");
-
-                result.add(new BillDTO(id, createdAt, paymentStatus, confirmStatus, paymentMethod, totalPrice, startDateModel, endDateModel, employeeId, carId, customerId));
+                Employee employee = employeeDAO.getEmployeeByID(employeeId);
+                Customer customer = customerDAO.getCustomerByID(customerId);
+                Car car = carDAO.getCarByID(carId);
+                result.add(new Bill(id, createdAt, paymentStatus, confirmStatus, paymentMethod, totalPrice, startDateModel, endDateModel, employee, car, customer));
             }
 
         } catch (SQLException e) {
@@ -133,8 +142,8 @@ public class BillDAOImp extends DAO implements BillDAO {
     }
 
     @Override
-    public BillDTO createBill(BillDTO billDTO) {
-        BillDTO bill = null;
+    public Bill createBill(BillDTO billDTO) {
+        Bill bill = null;
 
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss");
         LocalDateTime now = LocalDateTime.now();
@@ -167,7 +176,7 @@ public class BillDAOImp extends DAO implements BillDAO {
             e.printStackTrace();
         }
 
-        String sql2 = "UPDATE sqa.tblCar SET status = 'U/A' WHERE ID = " + bill.getCarId();
+        String sql2 = "UPDATE sqa.tblCar SET status = 'U/A' WHERE ID = " + bill.getCar().getId();
         try {
             PreparedStatement ps = con.prepareStatement(sql2);
             int res = ps.executeUpdate();
@@ -179,16 +188,16 @@ public class BillDAOImp extends DAO implements BillDAO {
     }
 
     @Override
-    public BillDTO updateBillById(BillDTO bill, int id) {
-        BillDTO result = null;
-        BillDTO billData =  this.getBillById(id);
+    public Bill updateBillById(BillDTO bill, int id) {
+        Bill result = null;
+        Bill billData =  this.getBillById(id);
         String sql = "UPDATE sqa.tblBill SET createdAt = ?, paymentStatus = ? , confirmStatus = ?, paymentMethod = ?, totalPrice = ?, startDate = ?, endDate = ?,employeeId = ?, carId = ?, customerId = ?  WHERE id = ? ";
 
         try {
             PreparedStatement ps = con.prepareStatement(sql);
 
             if(bill.getCreatedAt()!=null) ps.setString(1,bill.getCreatedAt());
-            else  ps.setString(1,billData.getCreatedAt());
+            else  ps.setString(1,billData.getCreateAt());
 
             if(bill.getPaymentStatus()==null) ps.setString(2, billData.getPaymentStatus());
             else ps.setString(2, bill.getPaymentStatus());
@@ -209,13 +218,13 @@ public class BillDAOImp extends DAO implements BillDAO {
             if(bill.getEndDate()==null) ps.setString(7,billData.getEndDate());
             else ps.setString(7,bill.getEndDate());
 
-            if(bill.getEmployeeId()==0) ps.setInt(8,billData.getEmployeeId());
+            if(bill.getEmployeeId()==0) ps.setInt(8,billData.getEmployee().getId());
             else ps.setInt(8,bill.getEmployeeId());
 
-            if(bill.getCarId()==0) ps.setInt(9,billData.getCarId());
+            if(bill.getCarId()==0) ps.setInt(9,billData.getCar().getId());
             else ps.setInt(9,bill.getCarId());
 
-            if(bill.getCustomerId()==0) ps.setInt(10,billData.getCustomerId());
+            if(bill.getCustomerId()==0) ps.setInt(10,billData.getCustomer().getId());
             else ps.setInt(10,bill.getCustomerId());
 
 

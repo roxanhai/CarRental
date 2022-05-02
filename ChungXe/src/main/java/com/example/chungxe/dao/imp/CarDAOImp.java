@@ -323,6 +323,35 @@ public class CarDAOImp extends DAO implements CarDAO {
         return car;
     }
 
+    //Viet Tiep o day
+    @Override
+    public Car updateCarByID(Car car, int id) {
+        Car result = null;
+        Car carData = this.getCarByID(id);
+        String sql = "UPDATE sqa.tblBill SET createdAt = ?, paymentStatus = ? , confirmStatus = ?, paymentMethod = ?, totalPrice = ?, startDate = ?, endDate = ?,employeeId = ?, carId = ?, customerId = ?  WHERE id = ? ";
+        return null;
+    }
+
+    @Override
+    public Car deleteCarByID(int id) {
+        Car car = this.getCarByID(id);
+        String sql = "DELETE FROM sqa.tblCar WHERE ID = ?";
+        PreparedStatement ps = null;
+        try {
+            ps = con.prepareStatement(sql);
+            ps.setInt(1, id);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        try {
+            int rs = ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return car;
+    }
+
     @Override
     public Car addCar(String name, MultipartFile imageFile, String color, String licensePlate, int seatNumber, float price, String carCategoryName, String branchName) throws IOException {
 

@@ -24,4 +24,8 @@ public interface CarDAO {
 
     Car getCarByLicensePlate (String licensePlate);
 
+    Car updateCarByID(Car car, int id);
+
+    Car deleteCarByID(int id);
+
 }

@@ -21,7 +21,7 @@ public class BillController {
 
     /*GET REQUEST*/
     @GetMapping("car")
-    public List<BillDTO> getBillsByCarAndDate(@RequestParam int carId, @RequestParam String startDate, @RequestParam String endDate){
+    public List<Bill> getBillsByCarAndDate(@RequestParam int carId, @RequestParam String startDate, @RequestParam String endDate){
         startDate += " 00:00:00";
         endDate += " 23:59:59";
         System.out.println(startDate);
@@ -30,13 +30,13 @@ public class BillController {
     }
     @GetMapping("/bill_id")
     public ResponseEntity<?> getBillById(@RequestParam int id){
-        BillDTO result = billDAO.getBillById(id);
+        Bill result = billDAO.getBillById(id);
         if(result == null) return new ResponseEntity("Không tìm thấy Bill thoả mãn yêu cầu", HttpStatus.NOT_IMPLEMENTED);
         return ResponseEntity.ok(result);
     }
 
     @PostMapping("/create_bill")
-    public BillDTO createBill(@RequestBody BillDTO billDTO) {
+    public Bill createBill(@RequestBody BillDTO billDTO) {
         return billDAO.createBill(billDTO);
     }
 
@@ -46,7 +46,7 @@ public class BillController {
     }
 
     @GetMapping("/date")
-    public List<BillDTO> getBillsByDate(@RequestParam String startDate, @RequestParam String endDate){
+    public List<Bill> getBillsByDate(@RequestParam String startDate, @RequestParam String endDate){
         return billDAO.getBillByDate(startDate, endDate);
     }
 
@@ -70,8 +70,7 @@ public class BillController {
     }
 
     @PutMapping("/{id}")
-    public BillDTO updateBillById(@PathVariable("id") int id, @RequestBody BillDTO bill){
-
+    public Bill updateBillById(@PathVariable("id") int id, @RequestBody BillDTO bill){
         return billDAO.updateBillById(bill, id);
     }
 }

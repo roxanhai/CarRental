@@ -41,7 +41,7 @@ public class BillDAOImp extends DAO implements BillDAO {
     public List<BillDTO> getBillsByDateAndCar(int carId, String startDate, String endDate) {
         List<BillDTO> result = new ArrayList<>();
         Car car = carDAO.getCarByID(carId);
-        String sql = "select * FROM sqa.tblBill where carId = ? and createdAt BETWEEN ? and ?";
+        String sql = "select * FROM sqa.tblBill where carId = ? and createdAt BETWEEN ? and ? and confirmStatus = 'confirm' ";
         try {
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setInt(1, carId);
@@ -174,7 +174,7 @@ public class BillDAOImp extends DAO implements BillDAO {
 
         } catch (SQLException e) {
             e.printStackTrace();
-        };
+        }
         return bill;
     }
 
@@ -182,7 +182,7 @@ public class BillDAOImp extends DAO implements BillDAO {
     public BillDTO updateBillById(BillDTO bill, int id) {
         BillDTO result = null;
         BillDTO billData =  this.getBillById(id);
-        String sql = "UPDATE tblBill SET createdAt = ?, paymentStatus = ? , confirmStatus = ?, paymentMethod = ?, totalPrice = ?, startDate = ?, endDate = ?, carId = ?, customerId = ?, employeeId = ? WHERE id = ? ";
+        String sql = "UPDATE sqa.tblBill SET createdAt = ?, paymentStatus = ? , confirmStatus = ?, paymentMethod = ?, totalPrice = ?, startDate = ?, endDate = ?,employeeId = ?, carId = ?, customerId = ?  WHERE id = ? ";
 
         try {
             PreparedStatement ps = con.prepareStatement(sql);
@@ -209,14 +209,16 @@ public class BillDAOImp extends DAO implements BillDAO {
             if(bill.getEndDate()==null) ps.setString(7,billData.getEndDate());
             else ps.setString(7,bill.getEndDate());
 
-            if(bill.getCarId()==0) ps.setInt(8,billData.getCarId());
-            else ps.setInt(8,bill.getCarId());
+            if(bill.getEmployeeId()==0) ps.setInt(8,billData.getEmployeeId());
+            else ps.setInt(8,bill.getEmployeeId());
 
-            if(bill.getCustomerId()==0) ps.setInt(9,billData.getCustomerId());
-            else ps.setInt(9,bill.getCustomerId());
+            if(bill.getCarId()==0) ps.setInt(9,billData.getCarId());
+            else ps.setInt(9,bill.getCarId());
 
-            if(bill.getEmployeeId()==0) ps.setInt(10,billData.getEmployeeId());
-            else ps.setInt(10,bill.getEmployeeId());
+            if(bill.getCustomerId()==0) ps.setInt(10,billData.getCustomerId());
+            else ps.setInt(10,bill.getCustomerId());
+
+
 
             ps.setInt(11, id);
 

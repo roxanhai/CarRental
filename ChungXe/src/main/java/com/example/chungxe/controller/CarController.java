@@ -87,9 +87,13 @@ public class CarController {
         return ResponseEntity.ok(result);
     }
 
-//    @DeleteMapping("/deleteCarByID")
-//    public Car deleteCarByID(@RequestParam int id){
-//        return carDAO.deleteCarByID(id);
-//    }
+    @DeleteMapping("/deleteCarByID")
+    public Car deleteCarByID(@RequestParam int id){
+        return carDAO.deleteCarByID(id);
+    }
 
+    @PutMapping("/updateCarByID/{id}")
+    public Car updateCarByID(@PathVariable("id") int id, @RequestBody Car car){
+        return carDAO.updateCarByID(car, id);
+    }
 }

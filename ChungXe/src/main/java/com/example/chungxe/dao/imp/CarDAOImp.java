@@ -328,23 +328,62 @@ public class CarDAOImp extends DAO implements CarDAO {
     public Car updateCarByID(Car car, int id) {
         Car result = null;
         Car carData = this.getCarByID(id);
-        String sql = "UPDATE sqa.tblBill SET createdAt = ?, paymentStatus = ? , confirmStatus = ?, paymentMethod = ?, totalPrice = ?, startDate = ?, endDate = ?,employeeId = ?, carId = ?, customerId = ?  WHERE id = ? ";
-        return null;
+        String sql = "UPDATE sqa.tblCar SET name = ?, color = ?, licensePlate = ?, seatNumber = ?, price = ?, status = ?, categoryId = ? WHERE id = ?";
+        try {
+            PreparedStatement ps = con.prepareStatement(sql);
+
+            if(car.getName()==null) ps.setString(1,carData.getName());
+            else ps.setString(1, car.getName());
+
+            if(car.getColor()==null) ps.setString(2,carData.getColor());
+            else ps.setString(2, car.getColor());
+
+            if(car.getLicensePlate()==null) ps.setString(3,carData.getLicensePlate());
+            else ps.setString(3, car.getLicensePlate());
+
+            if(car.getSeatNumber()==0)  ps.setInt(4, carData.getSeatNumber());
+            else  ps.setInt(4, car.getSeatNumber());
+
+            if(car.getPrice()==0) ps.setFloat(5, carData.getPrice());
+            else ps.setFloat(5, car.getPrice());
+
+            if(car.getStatus()==null) ps.setString(6,carData.getStatus());
+            else ps.setString(6,car.getStatus());
+
+            if(car.getCarCategory()==null)  ps.setInt(7, carData.getCarCategory().getId());
+            else  ps.setInt(7, car.getCarCategory().getId());
+
+            ps.setInt(8, id);
+
+
+            int res = ps.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        result = this.getCarByID(id);
+        return result;
     }
 
     @Override
     public Car deleteCarByID(int id) {
         Car car = this.getCarByID(id);
-        String sql = "DELETE FROM sqa.tblCar WHERE ID = ?";
-        PreparedStatement ps = null;
+
+        String sql1 = "DELETE FROM sqa.tblBill WHERE carId = ?";
+        PreparedStatement ps1 = null;
         try {
-            ps = con.prepareStatement(sql);
-            ps.setInt(1, id);
+            ps1 = con.prepareStatement(sql1);
+            ps1.setInt(1, id);
+            int rs = ps1.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        String sql2 = "DELETE FROM sqa.tblCar WHERE ID = ?";
+        PreparedStatement ps2 = null;
         try {
-            int rs = ps.executeUpdate();
+            ps2 = con.prepareStatement(sql2);
+            ps2.setInt(1, id);
+            int rs = ps2.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }

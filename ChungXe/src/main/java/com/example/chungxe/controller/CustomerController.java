@@ -44,8 +44,7 @@ public class CustomerController {
     @PostMapping("/register")
     public ResponseEntity<?> registerCustomer(@RequestBody Customer customer){
         Customer result = customerDAO.registerAccount(customer);
-        System.out.println(customer.getUsername() +" "+ customer.getPassword());
-        if(customer == null)  return new ResponseEntity("Thông tin tài khoản đã tồn tại", HttpStatus.NOT_IMPLEMENTED);
+        if(result == null)  return new ResponseEntity("Thông tin tài khoản đã tồn tại", HttpStatus.BAD_REQUEST);
         return ResponseEntity.ok(result);
     }
 }

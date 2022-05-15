@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,6 +56,32 @@ public class CustomerDAOImp extends DAO implements CustomerDAO {
 
         return customer;
     }
+
+    @Override
+    public Customer registerAccount(Customer customer) {
+        Customer temp = this.getCustomerByPhoneNumber(customer.getTelephone());
+        if(temp==null){
+            String sql = "INSERT into sqa.tblCustomer(fullname, identityCard, telephone, address, username, password)" +
+                    "values(?, ?, ?, ?, ?, ?)";
+
+            try {
+                PreparedStatement ps = con.prepareStatement(sql);
+                ps.setString(1, customer.getFullName());
+                ps.setString(2, customer.getIdentityCard());
+                ps.setString(3, customer.getTelephone());
+                ps.setString(4, customer.getAddress());
+                ps.setString(5, customer.getUsername());
+                ps.setString(6, customer.getPassword());
+                int res = ps.executeUpdate();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            return this.getCustomerByPhoneNumber(customer.getTelephone());
+        }
+
+        return null;
+    }
+
 
     @Override
     public Customer getCustomerByID(int cusId) {

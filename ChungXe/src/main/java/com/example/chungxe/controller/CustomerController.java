@@ -41,4 +41,11 @@ public class CustomerController {
         return customerDAO.getRevenueStatByCustomer();
     }
 
+    @PostMapping("/register")
+    public ResponseEntity<?> registerCustomer(@RequestBody Customer customer){
+        Customer result = customerDAO.registerAccount(customer);
+        System.out.println(customer.getUsername() +" "+ customer.getPassword());
+        if(customer == null)  return new ResponseEntity("Thông tin tài khoản đã tồn tại", HttpStatus.NOT_IMPLEMENTED);
+        return ResponseEntity.ok(result);
+    }
 }
